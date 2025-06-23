@@ -29,14 +29,37 @@
 #define Run_h 1
 
 #include "G4Run.hh"
+#include "G4ThreeVector.hh"
 
 class Run : public G4Run
 {
   public:
-    Run() = default;
-    ~Run() override = default;
-
-    void EndOfRun();
+    Run();
+    ~Run();
+    virtual void RecordEvent(const G4Event* anEvent) override;
+    virtual void Merge(const G4Run* aRun) override;
+    void EndOfRun() const;
+    
+    void SetPrimaryParticleId (const G4int id) { PrimaryParticleIdRun = id;};
+    void SetPrimaryParticleInitialKineticEnergy (const G4double E) { PrimaryParticleInitialKineticEnergyRun = E;};
+    void SetPrimaryParticleInitialTotalEnergy (const G4double E) { PrimaryParticleInitialTotalEnergyRun = E;};
+    void SetPrimaryParticleInitial3Momentum (const G4ThreeVector& valu) { PrimaryParticleInitial3MomentumRun = valu;};
+    void SetPrimaryParticleInitialPosition (const G4ThreeVector& valu) { PrimaryParticleInitialPositionRun = valu;};
+    void AddNumberDecays() { ++NumDecaysRun;}
+    
+    G4int GetPrimaryParticleId() const { return PrimaryParticleIdRun;}
+    G4double GetPrimaryParticleInitialKineticEnergy() const { return PrimaryParticleInitialKineticEnergyRun;}
+    G4double GetPrimaryParticleInitialTotalEnergy() const { return PrimaryParticleInitialTotalEnergyRun;}
+    G4ThreeVector GetPrimaryParticleInitial3Momentum() const { return PrimaryParticleInitial3MomentumRun;}
+    G4ThreeVector GetPrimaryParticleInitialPosition() const { return PrimaryParticleInitialPositionRun;}
+    G4int GetNumberDecays() const { return NumDecaysRun;}
+  private:
+  G4int PrimaryParticleIdRun;
+  G4double PrimaryParticleInitialKineticEnergyRun;
+  G4double PrimaryParticleInitialTotalEnergyRun;
+  G4ThreeVector PrimaryParticleInitial3MomentumRun;
+  G4ThreeVector PrimaryParticleInitialPositionRun;
+  G4int NumDecaysRun;
 };
 
 #endif

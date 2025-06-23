@@ -36,15 +36,16 @@ class PrimaryGeneratorMess;
 
 class G4Event;
 class G4GeneralParticleSource;
+class G4ParticleGun;
 class G4PhysicsTable;
 
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
   public:
     PrimaryGeneratorAction (DetectorStructure*);
-    ~PrimaryGeneratorAction () override;
+    ~PrimaryGeneratorAction ();
 
-    void GeneratePrimaries(G4Event*) override;
+   virtual void GeneratePrimaries(G4Event*) override;
 
     void BuildEmissionSpectrum();
     void SetOptPhotonPolar(G4double);
@@ -59,6 +60,7 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     DetectorStructure* fDetector = nullptr;
     G4GeneralParticleSource* fParticleGun = nullptr;
+    //G4ParticleGun *fParticleGun = nullptr;
     PrimaryGeneratorMess* fGunMessenger = nullptr;
 
     static G4bool fFirst;

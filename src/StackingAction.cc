@@ -44,11 +44,12 @@ G4ClassificationOfNewTrack StackingAction :: ClassifyNewTrack (const G4Track* aT
   if (aTrack->GetParentID() == 0) return fUrgent;
 
   if (particleType == G4OpticalPhoton::OpticalPhotonDefinition()) {
-  	if(aTrack->GetCreatorProcess()->GetProcessName() == "Scintillation") {
+  	//if(aTrack->GetCreatorProcess()->GetProcessName() == "Scintillation") {
     // keep optical photon
-    	++fPhotonCounter;
-    	return fUrgent;
-    	}
+    	//++fPhotonCounter;
+    	//return fUrgent;
+    	return fKill;
+    	//}
   }
   else {
     // discard all other secondaries
@@ -61,8 +62,8 @@ G4ClassificationOfNewTrack StackingAction :: ClassifyNewTrack (const G4Track* aT
 
 void StackingAction :: NewStage()
 {
-   G4cout << "Number of scintillation optical photons produces in this event : "
-          << fPhotonCounter << G4endl;
+   //G4cout << "Number of scintillation optical photons produces in this event : "
+          //<< fPhotonCounter << G4endl;
 }
 
 //

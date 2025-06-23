@@ -143,7 +143,7 @@ G4VPhysicalVolume* DetectorStructure::ConstructDetector()
   G4double posScin = GetBarThick()/2  + GetCoatingThickness() + 2 * GetCoatingRadius() + 2 * mm;
   G4double posScin1 = GetBarWidth()/2  + GetCoatingThickness() + 2 * GetCoatingRadius() + 1 * mm;
   G4double posScin2 = GetCoatingThickness() + 2 * GetCoatingRadius() ;
-  G4double posScin3 = GetBarWidth()/2  + 2 * GetCoatingThickness()  + 3 * GetCoatingRadius() + 0 * mm;
+  
   auto rotScin = new G4RotationMatrix();
     rotScin->rotateZ(90. * deg);
   new G4PVPlacement(nullptr, G4ThreeVector(0., posScin + 0.5 * posScin,0.), logicExtrusion, "Extrusion", fLogicWorld, false, 0);//The 1st scint
@@ -160,9 +160,10 @@ G4VPhysicalVolume* DetectorStructure::ConstructDetector()
 
   //--------------------------------------------------
   // Scintillator
-  //--------------------------------------------------G4_PLASTIC_SC_VINYLTOLUENE
+  //--------------------------------------------------
 
   auto ScintMaterial = FindMaterial("scint");
+  //auto ScintMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_Si");
   
   G4VSolid* Scintillator =
     new G4Box("Scintillator", GetBarWidth() / 2. - GetCoatingThickness() - GetCoatingRadius(),

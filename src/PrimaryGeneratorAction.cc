@@ -34,6 +34,8 @@
 #include "G4AutoLock.hh"
 #include "G4Event.hh"
 #include "G4GeneralParticleSource.hh"
+#include "G4ParticleGun.hh"
+#include "G4ParticleTable.hh"
 #include "G4Material.hh"
 #include "G4MaterialPropertiesTable.hh"
 #include "G4OpticalPhoton.hh"
@@ -51,11 +53,16 @@ G4Mutex gen_mutex = G4MUTEX_INITIALIZER;
 
 G4bool PrimaryGeneratorAction::fFirst = false;
 
-PrimaryGeneratorAction :: PrimaryGeneratorAction (DetectorStructure* dc)
+PrimaryGeneratorAction :: PrimaryGeneratorAction (DetectorStructure* dc) : G4VUserPrimaryGeneratorAction()
 {
   fDetector = dc;
 
   fParticleGun = new G4GeneralParticleSource();
+  /*fParticleGun = new G4ParticleGun(1);
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  fParticleGun->SetParticleDefinition(particleTable->FindParticle("mu-"));
+  fParticleGun->SetParticleEnergy(17.0 * MeV);
+  fParticleGun->SetParticlePosition(G4ThreeVector(0.0, 3.0, 0.0)*cm);*/
   fGunMessenger = new PrimaryGeneratorMess(this);
 }
 
@@ -137,7 +144,8 @@ void PrimaryGeneratorAction :: GeneratePrimaries (G4Event* anEvent)
     SetOptPhotonPolar();
     SetOptPhotonTime();
   }
-
+  //G4ThreeVector v(0.0, -1.0, 0.0);
+  //fParticleGun->SetParticleMomentumDirection(v);
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 

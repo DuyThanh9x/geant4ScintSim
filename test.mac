@@ -1,5 +1,7 @@
-/control/verbose 1
+#/control/verbose 1
 /run/verbose 1
+/process/em/verbose 0
+/process/had/verbose 0
 /tracking/verbose 0
 /event/verbose 0
 
@@ -13,12 +15,12 @@
 /scinsm/setCoatingRadius 1.775 mm
 
 /run/initialize
-/vis/disable
+#/vis/disable
 /gps/particle mu-
 
-/gps/energy 17 MeV
+/gps/energy 24 MeV
 
 /gps/position 0 3 0 cm
 /gps/direction 0 -1 0
-#/run/beamOn 1
+/run/beamOn 9000
 #/run/initialize

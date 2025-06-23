@@ -30,10 +30,12 @@
 
 #include "G4Types.hh"
 #include "G4UserSteppingAction.hh"
+#include "G4ThreeVector.hh"
 
 class DetectorStructure;
 class SteppingMess;
 class EventAction;
+class Run;
 
 class G4OpBoundaryProcess;
 class G4Track;
@@ -43,10 +45,11 @@ class SteppingAction : public G4UserSteppingAction
 {
   public:
     SteppingAction (DetectorStructure*, EventAction*);
-    ~SteppingAction () override;
+    virtual ~SteppingAction ();
 
-    void UserSteppingAction(const G4Step*) override;
-
+    virtual void UserSteppingAction(const G4Step*) override;
+    void Initialize();
+    
     // Set the bounce limit, 0 for no limit
     void SetBounceLimit(G4int);
 
@@ -54,12 +57,16 @@ class SteppingAction : public G4UserSteppingAction
     G4int GetNumberOfClad1Bounces();
     G4int GetNumberOfClad2Bounces();
     G4int GetNumberOfWLSBounces();
-    //G4double GetMuondEdx();
-    //G4double GetElectrondEdx();
+    
     // return number of successful events and reset the counter
     G4int ResetSuccessCounter();
 
   private:
+    G4int PrimaryParticleId;
+    G4double PrimaryParticleInitialKineticEnergy;
+    G4double PrimaryParticleInitialTotalEnergy;
+    G4ThreeVector PrimaryParticleInitial3Momentum;
+    G4ThreeVector PrimaryParticleInitialPosition;
     // Artificially kill the photon after it has bounced more than this number
     G4int fBounceLimit = 100000;
     // number of photons that reach the end

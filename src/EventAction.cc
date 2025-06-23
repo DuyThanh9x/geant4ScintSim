@@ -125,13 +125,14 @@ void EventAction::EndOfEventAction(const G4Event* evt)
   }
   G4int nScinHit = 0;
   if(scintCollect) { nScinHit = scintCollect->entries();}
-  for (size_t i = 0; i < nScinHit ; ++i) {
+  for (G4int i = 0; i < nScinHit ; ++i) {
     auto HitAccess = (*scintCollect)[i];
     if((HitAccess->GetTrackParticleName() == "mu-")) {
     	AddMudE(HitAccess->GetdE());
     	AddMudX(HitAccess->GetdX());
     }
-    if((HitAccess->GetTrackParticleName() == "e-")) {
+    if((HitAccess->GetTrackParticleName() == "e-")&&(HitAccess->GetTrackProcess() == "Decay")) {
+    	//G4cout<<"Track e- process "<<HitAccess->GetTrackProcess()<<G4endl;
     	AddElecdE(HitAccess->GetdE());
     	AddElecdX(HitAccess->GetdX());
     }

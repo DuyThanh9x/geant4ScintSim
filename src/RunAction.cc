@@ -38,10 +38,11 @@
 #include "Randomize.hh"
 #include "G4ProcessManager.hh"
 #include "G4MuonMinus.hh"
+#include "globals.hh"
 
 //
 
-RunAction :: RunAction()
+RunAction :: RunAction(SteppingAction* steppingAction) : G4UserRunAction(), SteppingAct (steppingAction)
 {
   auto analysisManager = G4AnalysisManager::Instance();
   if (isMaster) {
@@ -63,28 +64,33 @@ RunAction :: RunAction()
   analysisManager->FinishNtuple();
 }
 
+RunAction::~RunAction() {}
+
 //
 
 G4Run* RunAction::GenerateRun()
 {
-  fRun = new Run();
-  return fRun;
+  return new Run();
 }
 
 //
 
-void RunAction :: BeginOfRunAction (const G4Run*)
+void RunAction :: BeginOfRunAction (const G4Run* aRun)
 {
   G4AnalysisManager::Instance()->OpenFile("scinsm");
+  G4cout << "RunID: "<< aRun->GetRunID() << " starts." << G4endl;
+  if (SteppingAct) {
+    SteppingAct->Initialize();
+    }
 }
 
 //
 
-void RunAction :: EndOfRunAction (const G4Run*)
+void RunAction :: EndOfRunAction (const G4Run* aRun)
 {
   auto analysisManager = G4AnalysisManager::Instance();
   if (analysisManager->GetH1(0)) {
-    G4cout << " +++++++++++++++ print histograms statistics ++++++++++++++++++ "<< G4endl;
+    G4cout << " +++++++++++++++ print histograms statistics ";
     if (isMaster) {
       G4cout << "for the entire run "  << G4endl << G4endl;
     }
@@ -99,5 +105,7 @@ void RunAction :: EndOfRunAction (const G4Run*)
   analysisManager->Write();
   analysisManager->CloseFile();
   
-  if (isMaster) fRun->EndOfRun();
+  const Run* run = static_cast<const Run*>(aRun);
+  if (run == nullptr) return;
+  if (isMaster) run->EndOfRun();
 }

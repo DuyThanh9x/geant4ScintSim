@@ -32,19 +32,21 @@
 
 class Run;
 class G4Run;
+class SteppingAction;
 
 class RunAction : public G4UserRunAction
 {
   public:
-    RunAction();
-    ~RunAction() override = default;
+    RunAction(SteppingAction* steppingAction = nullptr);
+    virtual ~RunAction();
 
-    void BeginOfRunAction(const G4Run*) override;
-    void EndOfRunAction(const G4Run*) override;
-    G4Run* GenerateRun() override;
+    virtual void BeginOfRunAction(const G4Run* aRun) override;
+    virtual void EndOfRunAction(const G4Run* aRun) override;
+    virtual G4Run* GenerateRun() override;
 
   private:
-    Run* fRun = nullptr;
+    
+    SteppingAction* SteppingAct;
 };
 
 #endif

@@ -26,6 +26,7 @@
 //Addapted from example/extended/optical/wls/
 //
 #include "SteppingAction.hh"
+#include "Run.hh"
 
 #include "DetectorStructure.hh"
 #include "EventAction.hh"
@@ -33,7 +34,9 @@
 #include "SteppingMess.hh"
 #include "UserTrackInformation.hh"
 
+#include "G4RunManager.hh"
 #include "G4ParticleDefinition.hh"
+
 #include "G4OpBoundaryProcess.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4ProcessManager.hh"
@@ -52,8 +55,9 @@
 //
 
 SteppingAction :: SteppingAction (DetectorStructure* detector, EventAction* event)
-  : fDetector(detector), fEventAction(event)
+  : G4UserSteppingAction(), fDetector(detector), fEventAction(event)
 {
+  Initialize();
   fSteppingMessenger = new SteppingMess(this);
   ResetCounters();
   
@@ -68,6 +72,14 @@ SteppingAction::~SteppingAction()
 
 //
 
+void SteppingAction :: Initialize()
+{
+ PrimaryParticleId = 0;
+ PrimaryParticleInitialKineticEnergy = 0.0;
+ PrimaryParticleInitialTotalEnergy = 0.0;
+ PrimaryParticleInitial3Momentum = G4ThreeVector(0.0, 0.0, 0.0);
+ PrimaryParticleInitialPosition = G4ThreeVector(0.0, 0.0, 0.0);
+}
 void SteppingAction :: SetBounceLimit(G4int i)
 {
   fBounceLimit = i;
@@ -110,8 +122,6 @@ G4int SteppingAction :: ResetSuccessCounter()
   return temp;
 }
 
-
-
 void SteppingAction :: UserSteppingAction (const G4Step* theStep)
 {
   G4Track* theTrack = theStep->GetTrack();
@@ -130,21 +140,48 @@ void SteppingAction :: UserSteppingAction (const G4Step* theStep)
     thePrePVname = thePrePV->GetName();
     thePostPVname = thePostPV->GetName();
   }
+  auto RunPtr = static_cast<Run*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  if (theTrack->GetParentID() == 0 && theTrack->GetCurrentStepNumber() == 1 ) {
+  	PrimaryParticleId = theTrack->GetDefinition()->GetPDGEncoding();
+  	PrimaryParticleInitialKineticEnergy = theStep->GetPreStepPoint()->GetKineticEnergy();
+  	PrimaryParticleInitialTotalEnergy = theStep->GetPreStepPoint()->GetTotalEnergy();
+  	PrimaryParticleInitial3Momentum = theStep->GetPreStepPoint()->GetMomentum();
+  	PrimaryParticleInitialPosition = theStep->GetPreStepPoint()->GetPosition();
+  	
+	if (RunPtr) {
 
-  // Recording data for start
-  // static const G4ThreeVector ZHat = G4ThreeVector(0.0,0.0,1.0);
-  if (theTrack->GetParentID() == 0) {
-    // This is a primary track
-    if (theTrack->GetCurrentStepNumber() == 1) {
-      //        G4double x  = theTrack->GetVertexPosition().x();
-      //        G4double y  = theTrack->GetVertexPosition().y();
-      //        G4double z  = theTrack->GetVertexPosition().z();
-      //        G4double pz = theTrack->GetVertexMomentumDirection().z();
-      //        G4double fInitTheta =
-      //                         theTrack->GetVertexMomentumDirection().angle(ZHat);
-    }
+	  	RunPtr->SetPrimaryParticleId (PrimaryParticleId);
+	  	RunPtr->SetPrimaryParticleInitialKineticEnergy (PrimaryParticleInitialKineticEnergy);
+	  	RunPtr->SetPrimaryParticleInitialTotalEnergy (PrimaryParticleInitialTotalEnergy);
+	  	RunPtr->SetPrimaryParticleInitial3Momentum (PrimaryParticleInitial3Momentum);
+	  	RunPtr->SetPrimaryParticleInitialPosition (PrimaryParticleInitialPosition);
+	  	
+	}
   }
-
+    
+  if (theTrack->GetParentID() == 0 && theStep->GetPostStepPoint()->GetProcessDefinedStep() != nullptr
+      && theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName().find("Decay") != std::string::npos)
+  {
+  	const G4double ekin_dynamicParticle = theTrack->GetDynamicParticle()->GetKineticEnergy();
+  	const G4double etot_dynamicParticle = theTrack->GetDynamicParticle()->GetTotalEnergy();
+  	const G4ThreeVector momentum_dynamicParticle = theTrack->GetDynamicParticle()->GetMomentum();
+  	const G4double mass_dynamicParticle = theTrack->GetDynamicParticle()->GetMass();
+  	const G4ThreeVector decayPos = theStep->GetPostStepPoint()->GetPosition();
+  	const G4String decayVolume = theStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+  	const G4int decayVolumeNumber = theStep->GetPostStepPoint()->GetTouchableHandle()->GetCopyNumber(1);
+  	
+  	std::size_t nSecond = theStep->GetNumberOfSecondariesInCurrentStep();
+    	const std::vector<const G4Track*>* ptrVecSecondaries = theStep->GetSecondaryInCurrentStep();
+    	G4cout<<"Muon decay at "<<decayPos/cm<<" [cm] in Volume " <<decayVolume<<" number "<<decayVolumeNumber<<G4endl;
+    	for (std::size_t i = 0; i<nSecond; i++) {
+    		if (((*ptrVecSecondaries)[i]) && ((*ptrVecSecondaries)[i]->GetDefinition()->GetParticleName() == "e-")) {
+    			G4cout<<"Daughter Electron kinetic energy "<<(*ptrVecSecondaries)[i]->GetKineticEnergy()<<" [MeV] and momentum direction "<<(*ptrVecSecondaries)[i]->GetMomentumDirection()<<G4endl;
+    		}
+    	}
+    	if (RunPtr) { RunPtr->AddNumberDecays();}
+    	
+  }
+  
   // Retrieve the status of the photon
   G4OpBoundaryProcessStatus theStatus = Undefined;
 

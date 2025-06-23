@@ -31,15 +31,16 @@
 #include "G4VUserActionInitialization.hh"
 
 class DetectorStructure;
+class Run;
 
 class ActionInitial : public G4VUserActionInitialization
 {
   public:
     ActionInitial (DetectorStructure*);
-    ~ActionInitial () override = default;
+    virtual ~ActionInitial ();
 
-    void BuildForMaster() const override;
-    void Build() const override;
+    virtual void BuildForMaster() const override;
+    virtual void Build() const override;
 
   private:
     DetectorStructure* fDetector = nullptr;

@@ -35,22 +35,23 @@
 #include "SteppingAction.hh"
 #include "TrackingAction.hh"
 
-ActionInitial :: ActionInitial (DetectorStructure* det)
-  : G4VUserActionInitialization(), fDetector(det)
+ActionInitial :: ActionInitial (DetectorStructure* det) : G4VUserActionInitialization(), fDetector(det)
 {}
+
+ActionInitial :: ~ActionInitial () {}
 
 void ActionInitial :: BuildForMaster () const
 {
-  SetUserAction(new RunAction());
+  SetUserAction(new RunAction);
 }
 
 void ActionInitial :: Build () const
 {
   SetUserAction(new PrimaryGeneratorAction(fDetector));
-  SetUserAction(new RunAction());
-
   auto eventAction = new EventAction();
   SetUserAction(eventAction);
+  auto stepAct = new SteppingAction(fDetector, eventAction);
+  SetUserAction(new RunAction(stepAct));
 
   SetUserAction(new TrackingAction());
   SetUserAction(new SteppingAction(fDetector, eventAction));

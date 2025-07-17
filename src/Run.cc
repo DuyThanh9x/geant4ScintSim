@@ -30,20 +30,17 @@
 #include "G4Run.hh"
 #include "G4RunManager.hh"
 #include "G4SystemOfUnits.hh"
-
+#include "G4AnalysisManager.hh"
 //
-Run::Run()
-  : G4Run(), PrimaryParticleIdRun(0), PrimaryParticleInitialTotalEnergyRun(0.0), PrimaryParticleInitialKineticEnergyRun(0.0),
-  PrimaryParticleInitial3MomentumRun(G4ThreeVector()), PrimaryParticleInitialPositionRun(G4ThreeVector()), NumDecaysRun(0)
-  {}
+Run::Run() : G4Run() {}
 
 Run::~Run() {}
 
 void Run::RecordEvent(const G4Event* anEvent)
 {
 	G4int nEvt = anEvent->GetEventID();
-	if (nEvt % 100 == 0) {
-		G4cout << "Event ID number " << nEvt << G4endl;
+	if (nEvt % 1000 == 0) {
+		G4cout << "=========== Event ID number " << nEvt << G4endl;
 	}
 	G4Run::RecordEvent(anEvent);
 }
@@ -56,6 +53,9 @@ void Run::Merge(const G4Run* aRun)
 	PrimaryParticleInitialTotalEnergyRun = localRun->GetPrimaryParticleInitialTotalEnergy();
 	PrimaryParticleInitial3MomentumRun = localRun->GetPrimaryParticleInitial3Momentum();
 	PrimaryParticleInitialPositionRun = localRun->GetPrimaryParticleInitialPosition();
+	NumDecaysAtRestRun += localRun->GetNumberDecaysAtRest();
+	NumDecaysInFlightRun += localRun->GetNumberDecaysInFlight();
+	
 	G4Run::Merge(aRun);
 }
 
@@ -65,13 +65,17 @@ void Run::EndOfRun() const
   auto TotNbofEvents = G4double(numberOfEvent);
   G4int prec = G4cout.precision(3);
   G4cout << "\n+++++++++++++++++++: Run summary :+++++++++++++++++++\n";
-  G4cout << "Total number of events              : " << TotNbofEvents << G4endl
-  	 << "Primary PDG code                    : " << PrimaryParticleIdRun << G4endl
-  	 << "Primary initial kinetic energy [MeV]: " << PrimaryParticleInitialKineticEnergyRun << G4endl
-  	 << "Primary initial total energy [MeV]  : " << PrimaryParticleInitialTotalEnergyRun << G4endl
-  	 << "Primary initial momentum [MeV]      : " << PrimaryParticleInitial3MomentumRun << G4endl
-  	 << "Primary initial position [cm]       : " << PrimaryParticleInitialPositionRun / CLHEP::cm << G4endl
-  	 << "Number of decays                    : " << NumDecaysRun << G4endl;
+  G4cout << "Total number of events                    : " << TotNbofEvents << G4endl
+  	 << "Primary PDG code                          : " << PrimaryParticleIdRun << G4endl
+  	 << "Primary initial kinetic energy [MeV]      : " << PrimaryParticleInitialKineticEnergyRun << G4endl
+  	 << "Primary initial total energy [MeV]        : " << PrimaryParticleInitialTotalEnergyRun << G4endl
+  	 << "Primary initial momentum [MeV]            : " << PrimaryParticleInitial3MomentumRun << G4endl
+  	 << "Primary initial position [cm]             : " << PrimaryParticleInitialPositionRun / CLHEP::cm << G4endl
+  	 << "Number of decays At Rest                  : " << NumDecaysAtRestRun << G4endl
+  	 << "Number of decays In Flight                : " << NumDecaysInFlightRun << G4endl;
   G4cout << G4endl;
   G4cout.precision(prec);
+  
+  //auto analysisManager = G4AnalysisManager::Instance();
+  
 }

@@ -80,6 +80,7 @@ void EventAction::BeginOfEventAction(const G4Event*)
   fTotalElecdE = 0;
   //fTotalElecStep = 0;
   fTotalElecdX = 0;
+  CosinePolarisedPositron = -2;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -108,11 +109,11 @@ void EventAction::EndOfEventAction(const G4Event* evt)
   }
 
   auto analysisManager = G4AnalysisManager::Instance();
-  analysisManager->FillH1(2, mppcHC->entries());
+  //analysisManager->FillH1(2, mppcHC->entries());
   for (size_t i = 0; i < mppcHC->entries(); ++i) {
     auto pdHit = (*mppcHC)[i];
-    analysisManager->FillH1(0, pdHit->GetEnergy());
-    analysisManager->FillH1(1, pdHit->GetArrivalTime());
+    /*analysisManager->FillH1(0, pdHit->GetEnergy());
+    analysisManager->FillH1(1, pdHit->GetArrivalTime());*/
   }
   
   // Hit collection at Scintillators
@@ -124,33 +125,73 @@ void EventAction::EndOfEventAction(const G4Event* evt)
   	}
   }
   G4int nScinHit = 0;
+  std::set<G4int> decayTrack;
+  G4double daughterE;
+  auto RunPtr = static_cast<Run*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
   if(scintCollect) { nScinHit = scintCollect->entries();}
   for (G4int i = 0; i < nScinHit ; ++i) {
     auto HitAccess = (*scintCollect)[i];
-    if((HitAccess->GetTrackParticleName() == "mu-")) {
-    	AddMudE(HitAccess->GetdE());
-    	AddMudX(HitAccess->GetdX());
+    if((HitAccess->GetEndPointKineticE() == 0) && (HitAccess->GetHitParentID() == 0) && HitAccess->GetStepProcess() == "Decay") {
+    	decayTrack.insert(HitAccess->GetHitTrackID());
     }
-    if((HitAccess->GetTrackParticleName() == "e-")&&(HitAccess->GetTrackProcess() == "Decay")) {
-    	//G4cout<<"Track e- process "<<HitAccess->GetTrackProcess()<<G4endl;
-    	AddElecdE(HitAccess->GetdE());
-    	AddElecdX(HitAccess->GetdX());
-    }
+  }
+  
+  for (G4int i = 0; i < nScinHit ; ++i) {
+  	auto HitAccess = (*scintCollect)[i];
+  	for (G4int id : decayTrack) {
+  		if (HitAccess->GetHitTrackID() == id) {
+  			AddMudE(HitAccess->GetdE());
+    			AddMudX(HitAccess->GetdX());
+  		}
+  		if ((HitAccess->GetTrackParticleName() == "e+") && (HitAccess->GetHitParentID() == id )) {
+  			AddElecdE(HitAccess->GetdE());
+    			AddElecdX(HitAccess->GetdX());
+    			if (HitAccess->GetStepNumber() == 1) {
+    				daughterE = HitAccess->GetKineticE();
+    			}
+    			//G4cout<<"Volume "<<HitAccess->GetNameVolume()<<G4endl;
+  		}
+  	}
+  	//
+  	
+  	//}
+  	
+    //if((HitAccess->GetTrackParticleName() == "e-")) {
+    
+    /*for (G4int i = 0; i < nScinHit ; ++i) {
+  	auto HitAccess = (*scintCollect)[i];
+    	for (G4int id : decayTrack) {
+    		if ((HitAccess->GetTrackParticleName() == "e+") && (HitAccess->GetHitParentID() == id )) {
+    			
+    		}
+    	}*/
+    
+    		
+    	//"Track e- process "&&(HitAccess->GetTrackProcess() == "Decay"))
+    	
+    //}G4cout<<"Name "<<HitAccess->GetTrackParticleName()<<G4endl;
   }
   if (fTotalMudX) {
   G4double averageMu = (fTotalMudE/fTotalMudX) ;
-  analysisManager->FillNtupleDColumn(0,0,averageMu / (CLHEP::MeV/CLHEP::cm) );
-  analysisManager->AddNtupleRow(0);
+  /*analysisManager->FillNtupleDColumn(0,0,averageMu / (1/CLHEP::cm) );
+  analysisManager->AddNtupleRow(0);*/
   /*G4cout << " Average muon dEdX " << fTotalMudE/fTotalMudX&&(HitAccess->GetHitTrackParentID() == 0
            << G4endl; */
   }
   if (fTotalElecdX ) {
+  //if ((daughterE ) && (daughterE > 0)) {
   G4double averageE = (fTotalElecdE/fTotalElecdX) ;
-  analysisManager->FillNtupleDColumn(1,0,averageE / (CLHEP::MeV/CLHEP::cm) );
-  analysisManager->AddNtupleRow(1);
+  /*analysisManager->FillNtupleDColumn(1,0,averageE / (1/CLHEP::cm) );
+  analysisManager->FillNtupleDColumn(1,1,daughterE);
+  analysisManager->AddNtupleRow(1);*/
+  //analysisManager->AddNtupleRow(1);
   //G4cout << " Average electron dEdX " << fTotalElecdE/fTotalElecdX<< G4endl;* CLHEP::MeV/CLHEP::cm
   }
+  if (CosinePolarisedPositron != -2)
+  analysisManager->FillH1(0,CosinePolarisedPositron);
+  //if (fTotalElecdX ) {
   
+  //}
   
   
 

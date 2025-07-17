@@ -36,6 +36,8 @@
 
 #include "G4RunManager.hh"
 #include "G4ParticleDefinition.hh"
+#include "G4DecayTable.hh"
+#include "G4DecayProducts.hh"
 
 #include "G4OpBoundaryProcess.hh"
 #include "G4OpticalPhoton.hh"
@@ -140,6 +142,7 @@ void SteppingAction :: UserSteppingAction (const G4Step* theStep)
     thePrePVname = thePrePV->GetName();
     thePostPVname = thePostPV->GetName();
   }
+  
   auto RunPtr = static_cast<Run*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
   if (theTrack->GetParentID() == 0 && theTrack->GetCurrentStepNumber() == 1 ) {
   	PrimaryParticleId = theTrack->GetDefinition()->GetPDGEncoding();
@@ -155,30 +158,44 @@ void SteppingAction :: UserSteppingAction (const G4Step* theStep)
 	  	RunPtr->SetPrimaryParticleInitialTotalEnergy (PrimaryParticleInitialTotalEnergy);
 	  	RunPtr->SetPrimaryParticleInitial3Momentum (PrimaryParticleInitial3Momentum);
 	  	RunPtr->SetPrimaryParticleInitialPosition (PrimaryParticleInitialPosition);
+	  
 	  	
 	}
   }
-    
-  if (theTrack->GetParentID() == 0 && theStep->GetPostStepPoint()->GetProcessDefinedStep() != nullptr
-      && theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName().find("Decay") != std::string::npos)
+   
+  if ( theTrack->GetParentID() == 0 && theStep->GetPostStepPoint()->GetProcessDefinedStep() != nullptr
+      && theStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName().find("DecayWithSpin") != std::string::npos)
   {
-  	const G4double ekin_dynamicParticle = theTrack->GetDynamicParticle()->GetKineticEnergy();
-  	const G4double etot_dynamicParticle = theTrack->GetDynamicParticle()->GetTotalEnergy();
-  	const G4ThreeVector momentum_dynamicParticle = theTrack->GetDynamicParticle()->GetMomentum();
-  	const G4double mass_dynamicParticle = theTrack->GetDynamicParticle()->GetMass();
+  	const G4double ekin_dynamicParticle = theStep->GetPostStepPoint()->GetKineticEnergy();
   	const G4ThreeVector decayPos = theStep->GetPostStepPoint()->GetPosition();
-  	const G4String decayVolume = theStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
-  	const G4int decayVolumeNumber = theStep->GetPostStepPoint()->GetTouchableHandle()->GetCopyNumber(1);
-  	
+  	const G4String decayVolume = theStep->GetPostStepPoint()->GetPhysicalVolume()->GetName();
   	std::size_t nSecond = theStep->GetNumberOfSecondariesInCurrentStep();
-    	const std::vector<const G4Track*>* ptrVecSecondaries = theStep->GetSecondaryInCurrentStep();
-    	G4cout<<"Muon decay at "<<decayPos/cm<<" [cm] in Volume " <<decayVolume<<" number "<<decayVolumeNumber<<G4endl;
-    	for (std::size_t i = 0; i<nSecond; i++) {
-    		if (((*ptrVecSecondaries)[i]) && ((*ptrVecSecondaries)[i]->GetDefinition()->GetParticleName() == "e-")) {
-    			G4cout<<"Daughter Electron kinetic energy "<<(*ptrVecSecondaries)[i]->GetKineticEnergy()<<" [MeV] and momentum direction "<<(*ptrVecSecondaries)[i]->GetMomentumDirection()<<G4endl;
+  	
+  	if (nSecond == 0) G4cout<<">>>> Bad decay"<<G4endl;
+    	if (ekin_dynamicParticle == 0 ) {
+    		const std::vector<const G4Track*>* ptrVecSecondaries = theStep->GetSecondaryInCurrentStep();
+    		for (auto secondaries : *ptrVecSecondaries) {
+    			if ((secondaries) && (secondaries->GetDefinition()->GetParticleName() == "e+")) {
+    					double cos = secondaries->GetMomentumDirection()*(theTrack->GetPolarization());
+    					fEventAction->SetCosinePolarisedPositron(cos);
+    					//if (secondaries->GetPolarization() != G4ThreeVector(0.0, 0.0, 0.0))
+    					//G4cout <<"=====>> Polarized positron : "<<secondaries->GetPolarization()<<G4endl;
+    					
+    			}
     		}
+    		if (RunPtr && (nSecond > 0)) { RunPtr->AddNumberDecaysAtRest();}
     	}
-    	if (RunPtr) { RunPtr->AddNumberDecays();}
+    
+    	if (ekin_dynamicParticle > 0 ) {
+    		
+    		G4cout<< G4endl<< G4endl<<"=====>> "<<theTrack->GetDefinition()->GetParticleName()<<" decay In Flight"<<G4endl
+    					<<"=====>> Position "<<decayPos/cm<<" [cm]"<<" in Volume " <<decayVolume
+    					<< G4endl;
+    		G4cout<<G4endl;
+    		if (RunPtr && (nSecond > 0)) { RunPtr->AddNumberDecaysInFlight();}
+    		
+    	}
+    	
     	
   }
   

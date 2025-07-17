@@ -47,11 +47,13 @@ RunAction :: RunAction(SteppingAction* steppingAction) : G4UserRunAction(), Step
   auto analysisManager = G4AnalysisManager::Instance();
   if (isMaster) {
   analysisManager->SetNtupleMerging(true);
-  }
+  
   analysisManager->SetDefaultFileType("root");
+  G4AnalysisManager::Instance()->OpenFile("scinsm");
+  }
   analysisManager->SetVerboseLevel(1);
 
-  analysisManager->CreateH1("Energy", "Energy of optical photon", 100, 2. * CLHEP::eV,
+  /*analysisManager->CreateH1("Energy", "Energy of optical photon", 100, 2. * CLHEP::eV,
                             3.2 * CLHEP::eV);
   analysisManager->CreateH1("Time", "Arrival time", 100, 0., 100. * CLHEP::ns);
   analysisManager->CreateH1("Number of photons", "Number of photons", 100, 0., 100.);
@@ -59,12 +61,22 @@ RunAction :: RunAction(SteppingAction* steppingAction) : G4UserRunAction(), Step
   analysisManager->CreateNtuple("MudEdX","Average Mu Energy deposit");
   analysisManager->CreateNtupleDColumn("MudEdX");
     analysisManager->FinishNtuple();
-  analysisManager->CreateNtuple("ElecdEdX","Average Electron Energy deposit");
-  analysisManager->CreateNtupleDColumn("ElecdEdX");
-  analysisManager->FinishNtuple();
+  analysisManager->CreateNtuple("PositronEnergy","Positron Energy");
+  analysisManager->CreateNtupleDColumn("PosdEdX");
+  //analysisManager->FinishNtuple();
+  //analysisManager->CreateNtuple("ElecKineticE","Electron Kinetic Energy");
+  analysisManager->CreateNtupleDColumn("PosE");
+  analysisManager->FinishNtuple();*/
+  
+  
+  analysisManager->CreateH1("Direction","Positron angular distribution",70,-1,1);
+  analysisManager->SetH1XAxisTitle(0,"cos#theta");
+  analysisManager->SetH1YAxisTitle(0,"#events");
+  
 }
 
-RunAction::~RunAction() {}
+RunAction::~RunAction() {
+}
 
 //
 
@@ -77,8 +89,8 @@ G4Run* RunAction::GenerateRun()
 
 void RunAction :: BeginOfRunAction (const G4Run* aRun)
 {
-  G4AnalysisManager::Instance()->OpenFile("scinsm");
-  G4cout << "RunID: "<< aRun->GetRunID() << " starts." << G4endl;
+  G4cout << "========= RunID: "<< aRun->GetRunID() << " starts!" << G4endl;
+  
   if (SteppingAct) {
     SteppingAct->Initialize();
     }
@@ -88,24 +100,11 @@ void RunAction :: BeginOfRunAction (const G4Run* aRun)
 
 void RunAction :: EndOfRunAction (const G4Run* aRun)
 {
-  auto analysisManager = G4AnalysisManager::Instance();
-  if (analysisManager->GetH1(0)) {
-    G4cout << " +++++++++++++++ print histograms statistics ";
-    if (isMaster) {
-      G4cout << "for the entire run "  << G4endl << G4endl;
-    }
-    else {
-      G4cout << "for the local thread " << G4endl << G4endl;
-    }
-
-    G4cout << " Mean number of photons detected/event: " << analysisManager->GetH1(2)->mean()
-           << " rms = " << analysisManager->GetH1(2)->rms() << G4endl;
-  }
-
-  analysisManager->Write();
-  analysisManager->CloseFile();
-  
   const Run* run = static_cast<const Run*>(aRun);
   if (run == nullptr) return;
+  auto analysisManager = G4AnalysisManager::Instance();
+  
+  analysisManager->Write();
+  
   if (isMaster) run->EndOfRun();
 }

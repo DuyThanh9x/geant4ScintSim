@@ -33,35 +33,45 @@ G4bool Scintillators :: ProcessHits(G4Step* aStep, G4TouchableHistory*)
   if (!aStep) return false;
   
   G4double dE = aStep->GetTotalEnergyDeposit();
-  if (dE == 0) return false;
+  //if (dE == 0) return false;
   
   G4double dx = aStep->GetStepLength();
-  if (dx <= 0) return false;
+  //if (dx <= 0) return false;
   
   G4Track* theTrack = aStep->GetTrack();
   G4int partID = theTrack->GetParentID();
+  G4int StrackID = theTrack->GetTrackID();
   G4String part = theTrack->GetDefinition()->GetParticleName();
   G4String process = "";
   
   auto SaveHit = new ScintillatorsHit();
-
-  if ((partID == 0) || (partID == 1)) {
-  	if((part == "mu-") || (part == "e-") ) {
-	  	SaveHit->SetHitTrackParentID(partID);
-	  	SaveHit->SetTrackParticleName(part);
-	  	if (partID == 1) {
-	  		process = theTrack->GetCreatorProcess()->GetProcessName();
-	  		SaveHit->SetTrackProcess(process);
-	  	}
-	  	else SaveHit->SetTrackProcess("primary");
-	  	SaveHit->SetNameVolume(aStep->GetPreStepPoint()->GetPhysicalVolume()->GetName());
-	  	SaveHit->SetVolumeNumber(aStep->GetPreStepPoint()->GetTouchableHandle()->GetCopyNumber(1));
-	  	SaveHit->SetdE(dE);
-	  	SaveHit->SetdX(dx);
-	  	ScintHitCollect->insert(SaveHit);
-	}
-  }
   
+  	if((part == "mu+") || (part == "e+") ) {
+		SaveHit->SetHitTrackID(StrackID);
+		SaveHit->SetHitParentID(partID);
+		SaveHit->SetTrackParticleName(part);
+	  	//if (partID == 0) {
+	  	//	SaveHit->SetTrackProcess("primary");
+	  	//} else
+	  		//{
+	  	process = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
+	  			//theTrack->GetCreatorProcess()->GetProcessName();
+	  	SaveHit->SetStepProcess(process);
+	  		//}
+	  	//}
+	  	//
+	  	//
+		//SaveHit->SetNameVolume(aStep->GetPostStepPoint()->GetPhysicalVolume()->GetName());
+		  	//SaveHit->SetVolumeNumber(aStep->GetPostStepPoint()->GetTouchableHandle()->GetCopyNumber(1));
+		SaveHit->SetEndPointKineticE(aStep->GetPostStepPoint()->GetKineticEnergy());
+		SaveHit->SetKineticE(aStep->GetPreStepPoint()->GetKineticEnergy());
+		SaveHit->SetMomentumDirection(aStep->GetPreStepPoint()->GetMomentumDirection());
+		SaveHit->SetdE(dE);
+		SaveHit->SetdX(dx);
+    		SaveHit->SetStepNumber(theTrack->GetCurrentStepNumber());
+      }  	 
+  
+  ScintHitCollect->insert(SaveHit);
   
   return true;
 }

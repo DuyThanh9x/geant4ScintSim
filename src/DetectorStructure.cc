@@ -174,7 +174,7 @@ G4VPhysicalVolume* DetectorStructure::ConstructDetector()
   new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicScintillator, "Scintillator", logicExtrusion,
                     false, 0);
   
-  auto userLimitScin = new G4UserLimits(0.1*mm, DBL_MAX, 10*ms);
+  auto userLimitScin = new G4UserLimits(DBL_MAX, DBL_MAX, 10*ms);
   logicScintillator->SetUserLimits(userLimitScin); 
             
   if (GetCoatingRadius() > 0.) {

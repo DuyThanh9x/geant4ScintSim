@@ -62,7 +62,6 @@ void TrackingAction :: PreUserTrackingAction (const G4Track* aTrack)
     trackInformation->AddStatusFlag(InsideOfFiber);
   fpTrackingManager->SetUserTrackInformation(trackInformation);
 
-  
 }
 
 void TrackingAction :: PostUserTrackingAction (const G4Track* )

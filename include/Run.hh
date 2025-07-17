@@ -45,21 +45,29 @@ class Run : public G4Run
     void SetPrimaryParticleInitialTotalEnergy (const G4double E) { PrimaryParticleInitialTotalEnergyRun = E;};
     void SetPrimaryParticleInitial3Momentum (const G4ThreeVector& valu) { PrimaryParticleInitial3MomentumRun = valu;};
     void SetPrimaryParticleInitialPosition (const G4ThreeVector& valu) { PrimaryParticleInitialPositionRun = valu;};
-    void AddNumberDecays() { ++NumDecaysRun;}
+    
+    void AddNumberDecaysInFlight() { ++NumDecaysInFlightRun;}
+    void AddNumberDecaysAtRest() { ++NumDecaysAtRestRun;}
     
     G4int GetPrimaryParticleId() const { return PrimaryParticleIdRun;}
     G4double GetPrimaryParticleInitialKineticEnergy() const { return PrimaryParticleInitialKineticEnergyRun;}
     G4double GetPrimaryParticleInitialTotalEnergy() const { return PrimaryParticleInitialTotalEnergyRun;}
     G4ThreeVector GetPrimaryParticleInitial3Momentum() const { return PrimaryParticleInitial3MomentumRun;}
     G4ThreeVector GetPrimaryParticleInitialPosition() const { return PrimaryParticleInitialPositionRun;}
-    G4int GetNumberDecays() const { return NumDecaysRun;}
+    
+    G4int GetNumberDecaysInFlight() const { return NumDecaysInFlightRun;}
+    G4int GetNumberDecaysAtRest() const { return NumDecaysAtRestRun;}
+    
   private:
-  G4int PrimaryParticleIdRun;
-  G4double PrimaryParticleInitialKineticEnergyRun;
-  G4double PrimaryParticleInitialTotalEnergyRun;
-  G4ThreeVector PrimaryParticleInitial3MomentumRun;
-  G4ThreeVector PrimaryParticleInitialPositionRun;
-  G4int NumDecaysRun;
+  G4int PrimaryParticleIdRun = 0;
+  G4double PrimaryParticleInitialKineticEnergyRun = 0;
+  G4double PrimaryParticleInitialTotalEnergyRun = 0;
+  G4ThreeVector PrimaryParticleInitial3MomentumRun = G4ThreeVector(0., 0., 0.);
+  G4ThreeVector PrimaryParticleInitialPositionRun = G4ThreeVector(0., 0., 0.);
+  
+  G4int NumDecaysInFlightRun = 0;
+  G4int NumDecaysAtRestRun = 0;
+  
 };
 
 #endif

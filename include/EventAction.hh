@@ -63,6 +63,7 @@ class EventAction : public G4UserEventAction
     void AddElecdE (G4double ElecdE) {fTotalElecdE += ElecdE;}
     //void AddElecStep () {fTotalElecStep += 1;}
     void AddElecdX (G4double Elecdx) {fTotalElecdX += Elecdx;}
+    void SetCosinePolarisedPositron (G4double cv) {CosinePolarisedPositron = cv;}
 
   private:
     EventActionMess* fEventMessenger = nullptr;
@@ -86,7 +87,7 @@ class EventAction : public G4UserEventAction
     G4int fCoverEnd = 0;
     
     G4double fTotalMudE = 0;
-    //G4double fTotalMuStep = 0;
+    G4double CosinePolarisedPositron = -2;
     G4double fTotalMudX = 0;
     G4double fTotalElecdE = 0;
     //G4double fTotalElecStep = 0;

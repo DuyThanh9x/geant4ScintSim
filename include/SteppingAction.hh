@@ -67,6 +67,7 @@ class SteppingAction : public G4UserSteppingAction
     G4double PrimaryParticleInitialTotalEnergy;
     G4ThreeVector PrimaryParticleInitial3Momentum;
     G4ThreeVector PrimaryParticleInitialPosition;
+    
     // Artificially kill the photon after it has bounced more than this number
     G4int fBounceLimit = 100000;
     // number of photons that reach the end

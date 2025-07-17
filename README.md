@@ -1,1 +1,59 @@
 A simulation of a scintilation detector system
+The cosmic-ray antimuon decay at rest is simulated.
+
+=========================== DETECTOR STRUCTURE ==========================
+1. Scintillator bars:
+	Number of bars: 8
+	Dimension: 25 cm X 2.5 cm X 1 cm
+	Material: Polystyrene C8H8
+	There is a hole inside each bar to place a wavelength shifting fiber.
+	
+2. Wavelength shifting fibers (WLSs): the structure is the same as Kuraray Y-11 type
+	Number of fibers: 8
+	Dimension: Diameter: 1 mm, length: 26 cm
+	Material
+	One end of the fiber is covered by Aluminium foil.
+	There are 2 claddings cover each fiber.
+	Inner cladding:
+	Outer cladding:
+	
+3. MPPC and place holder:
+	At the moment, MPPC is just a piece of Aluminium and the holder is a piece of air.
+	
+The dimension of all components can be set by user UI commands starting with /scinsm/....
+	
+The material properties used of the scinitlators and WLSs are quite similar as the ones used in the T2K ND280.
+	
+=========================== PRIMARY GENERATOR ===========================
+The simulation uses G4 General Particle Source.
+For simplicity, A point source of Antimuons of 22 MeV kinetic energy is placed at (0, 3, 0) cm, aligned spin (0, 1, 0) along Y axis and momentum direction vertically downward. With this source, antimuons can decay at rest inside scinitlator.
+
+=========================== PHYSICS LIST ================================
+The Geant4 recommended FTFP_BERT physics list is used. The recommended electromagnetic constructor is G4EmStandardPhysics_option4 (EMZ).
+The decay physics constructor is G4SpinDecayPhysics. This constructor considers the particle polarization while the G4DecayPhysics does not.
+All is included in a PhysicsList class by default.
+You can use other physics lists and constructors by command option.
+
+=========================== SENSITIVE DETECTOR ==========================
+1. MPPC: Save optical photon hit information: Arrival time, energy,...
+
+2. Scintillators: Save antimuon and the decay product hit information: energy deposit, energy of the products, decay position,...
+
+=========================== ANALYSIS ====================================
+A 1D histogram is built on the angle between the charged daughter momentum direction and the parent antimuon polarization vector.
+At the moment, all the optical photon tracks are killed to save run time.
+
+=========================== HOW TO RUN ==================================
+Execute the programme with cmake and make.
+The simulation runs in multi worker threads. Number of Threads = 6 (default). You should choose the number of threads less than the number of CPU cores by 2.
+
+1. Interactive mode:
+	Simply run command: ./scinsm
+	It will automatically run the vis.mac to visualise the detector, hits, tracks,...
+	
+2. Batch mode:
+	Command: ./scinsm [-m macro] [-p physicsList] [-t nThreads] [-v | --verbose] [-h | --help]
+	
+	The macro for this mode is test.mac
+	The physics list can choose as you prefer. For instance, run the programme with option "-p FTFP_BERT_EMZ+G4SpinDecayPhysics", it means you use FTFP\_BERT physics list and replace by "G4EmStandardPhysics_option4" (the underscore means replacing a physics constructor) and add G4SpinDecayPhysics (the plus means adding a physics constructor)
+	Number of threads can set using -t flag.

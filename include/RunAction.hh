@@ -45,7 +45,6 @@ class RunAction : public G4UserRunAction
     virtual G4Run* GenerateRun() override;
 
   private:
-    
     SteppingAction* SteppingAct;
 };
 

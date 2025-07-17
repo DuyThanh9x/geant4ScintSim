@@ -55,5 +55,5 @@ The simulation runs in multi worker threads. Number of Threads = 6 (default). Yo
 	Command: ./scinsm [-m macro] [-p physicsList] [-t nThreads] [-v | --verbose] [-h | --help]
 	
 	The macro for this mode is test.mac
-	The physics list can choose as you prefer. For instance, run the programme with option "-p FTFP_BERT_EMZ+G4SpinDecayPhysics", it means you use FTFP\_BERT physics list and replace by "G4EmStandardPhysics_option4" (the underscore means replacing a physics constructor) and add G4SpinDecayPhysics (the plus means adding a physics constructor)
+	The physics list can choose as you prefer. For instance, run the programme with option "-p FTFP_BERT_EMZ+G4SpinDecayPhysics", it means you use FTFP_BERT physics list and replace by "G4EmStandardPhysics_option4" (the underscore means replacing a physics constructor) and add G4SpinDecayPhysics (the plus means adding a physics constructor)
 	Number of threads can set using -t flag.

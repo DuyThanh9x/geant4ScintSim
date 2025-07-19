@@ -7,15 +7,16 @@ The cosmic-ray antimuon decay at rest is simulated.
 	Dimension: 25 cm X 2.5 cm X 1 cm
 	Material: Polystyrene C8H8
 	There is a hole inside each bar to place a wavelength shifting fiber.
+	Scintillator Coating: 15% TiO2 and 85% polystyrene by weight
 	
 2. Wavelength shifting fibers (WLSs): the structure is the same as Kuraray Y-11 type
 	Number of fibers: 8
 	Dimension: Diameter: 1 mm, length: 26 cm
-	Material
+	Material: C9H10
 	One end of the fiber is covered by Aluminium foil.
 	There are 2 claddings cover each fiber.
-	Inner cladding:
-	Outer cladding:
+	Inner cladding: C5H8O2
+	Outer cladding: C2H4
 	
 3. MPPC and place holder:
 	At the moment, MPPC is just a piece of Aluminium and the holder is a piece of air.

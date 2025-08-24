@@ -1,7 +1,0 @@
-/home/thanh/Documents/muondecay-ICISE/simulation/scinsm/buildSim/CMakeFiles/scinsm.dir
-/home/thanh/Documents/muondecay-ICISE/simulation/scinsm/buildSim/CMakeFiles/edit_cache.dir
-/home/thanh/Documents/muondecay-ICISE/simulation/scinsm/buildSim/CMakeFiles/rebuild_cache.dir
-/home/thanh/Documents/muondecay-ICISE/simulation/scinsm/buildSim/CMakeFiles/list_install_components.dir
-/home/thanh/Documents/muondecay-ICISE/simulation/scinsm/buildSim/CMakeFiles/install.dir
-/home/thanh/Documents/muondecay-ICISE/simulation/scinsm/buildSim/CMakeFiles/install/local.dir
-/home/thanh/Documents/muondecay-ICISE/simulation/scinsm/buildSim/CMakeFiles/install/strip.dir

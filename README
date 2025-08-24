@@ -1,5 +1,5 @@
 A simulation of a scintilation detector system
-The cosmic-ray antimuon decay at rest is simulated.
+The cosmic-ray antimuon decay at rest is simulated using Geant4 version geant4-11.3.2.
 
 =========================== DETECTOR STRUCTURE ==========================
 1. Scintillator bars:
@@ -45,7 +45,7 @@ A 1D histogram is built on the angle between the charged daughter momentum direc
 At the moment, all the optical photon tracks are killed to save run time.
 
 =========================== HOW TO RUN ==================================
-Execute the programme with cmake and make.
+Build the programme with cmake and make.
 The simulation runs in multi worker threads. Number of Threads = 6 (default). You should choose the number of threads less than the number of CPU cores by 2.
 
 1. Interactive mode:

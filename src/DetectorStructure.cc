@@ -378,6 +378,7 @@ G4VPhysicalVolume* DetectorStructure::ConstructDetector()
   // Clear Fiber (Coupling Layer)
   G4VSolid* Couple = new G4Box("Couple", fCoupleR / 2, fCoupleR / 2, fCoupleZ / 2);
 
+  //auto plastic = G4NistManager::Instance()->FindOrBuildMaterial("G4_POLYETHYLENE");
   auto logicCouple = new G4LogicalVolume(Couple, air, "Couple");
 
   new G4PVPlacement(nullptr, G4ThreeVector(0., posScin + 0.5*posScin, fCoupleOrigin), logicCouple, "Couple",
